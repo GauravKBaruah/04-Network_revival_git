@@ -15,10 +15,10 @@ kaiser-bunbury_et_al_2017.html) and was used to produce figure 1E-1F.
 
 #### R scripts:
 
-`01_ODE_Function.R` is the script that details all functions required for the eco-evolutionary dynamical simulation and analysis and figure plotting.
-`01_hyst_functions.R` is the R script that has all the functions required to produce figure 1 .
-`01_Figure_1_hysteresis.R` R script to reproduce figure 1.
-`figure_2.R` R script that does the eco-evolutionary simulation to reproduce figure 2.
-`figure_3_a.R` R script that does the eco-evolutionary simulation to reproduce part of figure 3 (i.e., Figure 3 A-H)
-`figure_3_b.R`  R script that does the eco-evolutionary simulation to reproduce second part of figure 3 (i.e., Figure 3 I-N)
-`figure_4.R` R script to reproduce figure 4.
+1. `01_ODE_Function.R` is the script that details all functions required for the eco-evolutionary dynamical simulation and analysis and figure plotting.
+2. `01_hyst_functions.R` is the R script that has all the functions required to produce figure 1 .
+3. `01_Figure_1_hysteresis.R` R script to reproduce figure 1.
+4. `figure_2.R` R script that does the eco-evolutionary simulation to reproduce figure 2.
+5. `figure_3_a.R` R script that does the eco-evolutionary simulation to reproduce part of figure 3 (i.e., Figure 3 A-H)
+6. `figure_3_b.R`  R script that does the eco-evolutionary simulation to reproduce second part of figure 3 (i.e., Figure 3 I-N)
+7. `figure_4.R` R script to reproduce figure 4.
