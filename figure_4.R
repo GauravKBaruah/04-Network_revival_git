@@ -104,12 +104,12 @@ tempdat<-webdat_2 %>% filter(mut_strength>1, individual_variation == "high")
                  aes(color=factor(Connectance_group)))+ 
      facet_wrap(~individual_variation))
 
-
+#figure 4
 ggpubr::ggarrange(n1,n2,n3,
                   nrow=3,ncol=1, labels =c("A", "B", "C"))
 
 
-###### species level data #########
+###### species level data #################################################
 
 load("figure_4_species_level_data.RData")
 
@@ -133,65 +133,6 @@ str(spdat_3)
 
 
 
-spdat_3 %>% filter(mutualism_strength <= 1.5) %>% 
-  select(response_time, Individual_variation, 
-         response_thr,Network_size, mutualism_strength) %>% 
-  group_by(Individual_variation, mutualism_strength, Network_size) %>% 
-  summarise(Fraction = mean(response_thr, na.rm=T)) %>% 
-  ggplot(aes(y = (Fraction), x = Individual_variation, fill=(Individual_variation )))+
-  ylab("Species fraction that responded to perturbation")+
-  xlab("Individual variation")+
-  # add half-violin from {ggdist} package
-  stat_halfeye(
-    # adjust bandwidth
-    adjust = 0.5,
-    # move to the right
-    justification = -0.2,
-    # remove the slub interval
-    .width = 0,
-    point_colour = NA
-  ) +
-  geom_boxplot(
-    width = 0.12,
-    # removing outliers
-    outlier.color = NA,
-    alpha = 0.5
-  )
-
-
-
-spdat_3 %>% 
-  select(response_time, Connectance, Nestedness, Individual_variation, response_thr ,Network_size, mutualism_strength) %>% 
-  group_by(Individual_variation, mutualism_strength, Network_size,Connectance, Nestedness) %>% 
-  summarise(mean_response_time=mean(response_time,na.rm=T)) %>% 
-  ggplot(aes(x= Nestedness, y = mean_response_time, color= factor(Individual_variation)))+
-  geom_point(size=5,alpha=0.75)+
-  xlab("Nestedness")+
-  scale_color_manual(values=c( "#E69F00", "#56B4E9"))+
-  ylab("Mean network response time")
-
-spdat_3 %>%
-  select(response_time, Connectance, Nestedness, Individual_variation, response_thr ,Network_size, mutualism_strength) %>% 
-  group_by(Individual_variation, mutualism_strength, Network_size,Connectance, Nestedness) %>% 
-  summarise(mean_response_time=mean(response_time,na.rm=T)) %>% 
-  ggplot(aes(x= Nestedness, y = mean_response_time, color= factor(Individual_variation)))+
-  geom_point(size=5,alpha=0.75)+
-  xlab("Connectance")+
-  scale_color_manual(values=c( "#E69F00", "#56B4E9"))+
-  ylab("Mean network response time")
-
-spdat_3 %>%
-  select(response_time, Connectance, Nestedness, Individual_variation, response_thr ,Network_size, mutualism_strength) %>% 
-  group_by(Individual_variation, mutualism_strength, Network_size,Connectance, Nestedness) %>% 
-  summarise(mean_response_time=mean(response_time,na.rm=T)) %>% 
-  ggplot(aes(x= Network_size, y = mean_response_time, color= factor(Individual_variation)))+
-  geom_point(size=5,alpha=0.75)+
-  xlab("Network size")+
-  scale_color_manual(values=c( "#E69F00", "#56B4E9"))+
-  ylab("Mean network response time")
-
-
-
 spdat_3$fraction_abundance<- 0
 
 spdat_3$fraction_abundance[which(spdat_3$abundance>= 0.5) ]<-1
@@ -206,9 +147,9 @@ spdat_3$fraction_abundance[which(spdat_3$abundance< 0.5) ]<-0
   ggplot(aes(x = Individual_variation, y = Fraction, fill= Individual_variation ))+
   ylab("Mean species desnity")+
   xlab("Individual variation")+
-  labs(fill="")+
-    theme(legend.position = "")+
-  # add half-violin from {ggdist} package
+    xlab("")+
+    guides(fill="none")+
+    # add half-violin from {ggdist} package
   stat_halfeye(
     # adjust bandwidth
     adjust = 1,
@@ -218,6 +159,7 @@ spdat_3$fraction_abundance[which(spdat_3$abundance< 0.5) ]<-0
     .width = 0,
     point_colour = NA
   ) +
+    theme_classic()+
   geom_boxplot(
     width = 0.25,
     # removing outliers
@@ -227,87 +169,36 @@ spdat_3$fraction_abundance[which(spdat_3$abundance< 0.5) ]<-0
 
 
 
-(r3<-spdat_3 %>% filter(mutualism_strength > 1) %>% 
-    select(response_time, Individual_variation, fraction_abundance,
-           response_thr ,Network_size, abundance, mutualism_strength) %>% 
-    group_by(Individual_variation, Network_size) %>% 
-    summarise(Fraction_species = mean(fraction_abundance, na.rm=T)) %>% 
-    ggplot(aes(x = Individual_variation, y = Fraction_species, fill= Individual_variation ))+
-    labs(y = expression(paste("Proportion of species with ", N[i] > 0.5 )))+
-    xlab("Individual variation")+ylim(c(0,1))+
-    labs(fill="")+
-    theme(legend.position = "")+
-    # add half-violin from {ggdist} package
-    stat_halfeye(
-      # adjust bandwidth
-      adjust = 1,
-      # move to the right
-      justification = -0.2,
-      # remove the slub interval
-      .width = 0,
-      point_colour = NA
-    ) +
-    geom_boxplot(
-      width = 0.25,
-      # removing outliers
-      outlier.color = NA,
-      alpha = 0.5
-    )+ scale_fill_manual(values=c( "#E69F00", "#56B4E9")))
-
-
-
 appender <- function(string) 
   latex2exp::TeX(paste("$\\gamma_{\\0} = $", string))  
 
-(a1<-spdat_3 %>% filter( mutualism_strength> 1.1) %>% group_by(Nestedness,Connectance, forcing_strength,
+
+
+ (a2<-spdat_3 %>% group_by(Nestedness,Connectance, forcing_strength,
                           Individual_variation, Network_size , mutualism_strength) %>%
     summarise(count=n(),
-              count_abundance = sum(abundance >= 0.5),
+              count_abundance =  sum(abundance >= 0.5),
               proportion_abundance = count_abundance/count ) %>%
-    filter(forcing_strength == 0.5, Network_size < 200) %>% 
+    filter(forcing_strength == 0.5,mutualism_strength > 1.1) %>% 
     ggplot( aes(y = (proportion_abundance),
                 x = Nestedness,
                 colour = Individual_variation))+
-    geom_point(size=3)+
+    geom_point(size=4)+
+     ylim(c(0,1))+
     geom_smooth(method = "glm", 
                 method.args = list(family = "quasibinomial"), 
-                se = T, size=2.5) +
-    #geom_smooth(method = lm, formula = y ~ splines::bs(x, 2), se = F)+
+               se = T, size=1.5) +
+    #geom_smooth(method = lm, formula = y ~x, se = F)+
     theme_classic()+
-    scale_x_log10()+
+     theme(legend.position = "right")+
     xlab("Nestedness (NODF)")+
-    scale_color_manual(values=c( "#E69F00", "#56B4E9"))+
-    labs(color="Individual variation")+
-    labs(y = expression(paste("Proportion of species with ", N[i] > 0.5 )))+
-    facet_wrap(.~mutualism_strength, nrow = 2,ncol = 4, labeller = as_labeller(appender, default = label_parsed)))
+     scale_color_manual(values=c( "#E69F00", "#56B4E9"))+
+     #labs(color= expression(paste(gamma[0])))+
+    labs(y = expression(paste("Proportion of species with ", N[i] > 0.5 )))+ 
+     facet_wrap(.~mutualism_strength, nrow = 2,ncol = 4, labeller = as_labeller(appender, default = label_parsed)))
 
 
-
-ggpubr::ggarrange(a1,
-                  ggpubr::ggarrange(r2,r3, ncol=2, labels=c("B","C")),
+#figure 5
+ggpubr::ggarrange(a2,
+                  ggpubr::ggarrange(r2, ncol=2, labels=c("B")),
                   nrow=2, labels ="A")
-
-(a1<-spdat_3 %>% filter( mutualism_strength> 1.1) %>% group_by(Nestedness,Connectance, forcing_strength,
-                                                               Individual_variation, Network_size , mutualism_strength) %>%
-    summarise(count=n(),
-              count_abundance = sum(abundance >= 0.5),
-              proportion_abundance = count_abundance/count ) %>%
-    filter(forcing_strength == 0.5, Network_size < 200) %>% 
-    ggplot( aes(y = (proportion_abundance),
-                x = Network_size,
-                colour = Individual_variation))+
-    geom_point(size=3)+
-    geom_smooth(method = "glm", 
-                method.args = list(family = "quasibinomial"), 
-                se = T, size=2.5) +
-    #geom_smooth(method = lm, formula = y ~ splines::bs(x, 2), se = F)+
-    theme_classic()+
-    scale_x_log10()+
-    xlab("Network size")+
-    scale_color_manual(values=c( "#E69F00", "#56B4E9"))+
-    labs(color="Individual variation")+
-    labs(y = expression(paste("Proportion of species with ", N[i] > 0.5 )))+
-    facet_wrap(.~mutualism_strength, nrow = 2,ncol = 4, labeller = as_labeller(appender, default = label_parsed)))
-
-
-
