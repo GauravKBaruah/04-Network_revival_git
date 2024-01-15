@@ -1,28 +1,24 @@
 
 
 rm(list=ls())
-source("01_hyst_functions")
+source("01_hyst_functions.R")
 
-#require(deSolve) ## for integrating ordinary differential equations
-#require(tidyverse) ## for efficient data manipulation & plotting
-#require(cowplot) ## for arranging plots in a grid
-#library(dplyr)
-#library(readr)
-#library(beepr)
-#library(viridis)
-
-library(foreach)
-library(doMC)
-library(statmod)
-#require(deSolve) ## for integrating ordinary differential equations
-#require(tidyverse) ## for efficient data manipulation & plotting
-#library(cowplot) ## for arranging plots in a grid
+require(tidyverse) ## for efficient data manipulation & plotting
+require(cowplot) ## for arranging plots in a grid
 library(dplyr)
-#library(readr)
+library(readr)
+library(viridis)
 library(beepr)
-#library(viridis)
-numcores<- 20
-registerDoMC(numcores)
+library(GGally)
+library(network)
+library(sna)
+library(nlme)
+library(lmerTest)
+library(ggplot2)
+library(ggnet)
+library(gganimate)
+library(gifski)
+
 
 
 #theme_set(theme_classic()) 
@@ -54,8 +50,6 @@ for(i in 1:nrow(trait_data)){
   nestedness<-nestedness_NODF(g)
   C<-Connectance(g)
   
-#  trait_data$nestedness[i]<- nestedness
- # trait_data$connectance[i]<- C
   trait_data$networksize[i] <- Aspecies+Plantspecies
   muinit <-runif((Aspecies+Plantspecies), -0.5,0.5)
   
@@ -68,157 +62,6 @@ for(i in 1:nrow(trait_data)){
 
 fact2<- trait_data %>% filter(networksize < 185)
 webfiles<-fact2$web
-#creating the final dataframe over which all the data will be simulated and collected
-fact<- expand.grid(`Strength_mutualism`=seq(0.1, 5, 0.25),
-                   `web` = webfiles[1:70],
-                   `h2`= 0.25,
-                   `model`="abundance",
-                    hysteresis_check=c("yes", "no"),
-                   `interaction_type`= "trade_off", 
-                   `random_seed`=4327+(1:1)*100) %>%
-  as_tibble %>%
-  mutate(biomass=0,
-         richness =0)
-model.t<-list()
-
-
-set.seed(1234)
-
-new_ddf<-NULL
-
-
-
-outt<-foreach(r = 1:nrow(fact))%dopar%{
-  #print(r)
-  
-  
-  g<-adj.mat(myfiles[which(myfiles == fact$web[r])]) #network web names
-  # g<-g[-1,-1] 
-  
-  
-  Aspecies<- dim(g)[2] # no of animal species
-  Plantspecies<- dim(g)[1] # no of plant species
-  degree.animals<-degree.plants<-numeric()
-  
-  #degree of plants and anichmals
-  for(i in 1:Plantspecies){
-    degree.plants[i]<-sum(g[i,])} # degree of plants
-  for(j in 1:Aspecies){
-    degree.animals[j]<-sum(g[,j]) # degree of animals
-  }
-  
-  ##control loop for selecting whether variation is high or low
-  
-  sig <-runif((Aspecies+Plantspecies),0.005,0.005)
-  
-  h2<-fact$h2[r]
-  
-  ## vector of species trait standard deviations
-  
-  if(fact$hysteresis_check[r] == "yes"){
-  N <- runif( (Aspecies+Plantspecies) , 0,0.005)}else if(fact$hysteresis_check[r] == "no"){
-    N <- runif( (Aspecies+Plantspecies) , 1,1)
-  }  ## initial species densities
-  index<-which(names(trait_data_list)==fact$web[r])
-  
-  muinit<-trait_data_list[[index]]
-  mainit<-muinit[1:Aspecies]
-  mpinit<-muinit[(Aspecies+1): (Aspecies+Plantspecies)]
-  
-  nainit<- N[1:Aspecies]
-  npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
-  
-  Amatrix<-mat.comp(g,degree.animals,degree.plants)$Amatrix
-  Pmatrix<-mat.comp(g,degree.animals,degree.plants)$Pmatrix
-  gamma=0.35#fact_lessvar$Strength_mutualism[r]
-  mut.strength<-runif( (Aspecies+Plantspecies), fact$Strength_mutualism[r],fact$Strength_mutualism[r])
-  nestedness<-nestedness_NODF(g)
-  C<-Connectance(g)
-  web.name<-fact$web[r]
-  ba<-runif(Aspecies, 0.05,0.05)
-  bp<-runif(Plantspecies,0.05,0.05)
-  dganimals<-degree.animals
-  dgplants<-degree.plants
-  
-  
-  ic <-c(nainit, npinit, mainit,mpinit)
-  
-  #fact$noise
-  params <- list(time=time,matrix=g,sig=sig,Amatrix=Amatrix,
-                 Pmatrix=Pmatrix,w=gamma,model=fact$model[r],
-                 interaction_type=fact$interaction_type[r],
-                 hysteresis_check=fact$hysteresis_check[r],
-                 mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
-                 web.name=web.name,h2=h2, ba=ba,bp=bp,dganimals=dganimals,
-                 dgplants=dgplants)
-  
-  
-  
-  
-  start.time =3000
-  
-   model.t<-eqs(time = start.time,state = ic,pars = params)
-  #system.time( model.t<-lapply(1, Mcommunity,time=start.time,state=ic,
-   #                            pars=params))
-  
-  
-  
-  #par(mfrow=c(2,1))
- # ts.plot(model.t$Animals,gpars= list(col=viridis(40)),lwd=2.5,   ylab = "Plant Abundance")
-  #ts.plot(model.t$Plant.trait,gpars= list(col=viridis(40)),lwd=2.5,   ylab = "Plant Abundance")
-  
-  
-  
-  #ts.plot(model.t[[1]]$Animals,gpars= list(col=viridis(40)),lwd=2.5,
-  #       xlab = "Time", ylab = "Animal Abundance")
-  # 
-  #plot_snapshot(Na = model.t[[1]]$Animals[1000,],
-  #             Np = model.t[[1]]$Plants[1000,],
-  #             m = c(model.t[[1]]$Animal.trait[1000,], model.t[[1]]$Plant.trait[1000,]),
-  #           sigma =sig, moment=0, limits=c(-1, 1), res=1001)
-  # #
-  # pbiomass<-sum( colMeans(model.t$Plants[200:800,]))
-  # abiomass<-sum( colMeans(model.t$Animals[200:800,]))
-  # 
-  # 
-  # fact$Biomass[r] = abiomass+pbiomass
-  # fact$richness[r] =  (length(which(model.t$Plants[799,] > 0.5))+length(which(model.t$Animals[799,] > 0.5)))
-  # fact$Nestedness[r] = nestedness_NODF(g)
-  # fact$Connectance[r] = Connectance(g)
-  # fact$mean.trait.matching[r] = trait.matching(mA=model.t$Animal.trait[799,],
-  #                                              mP = model.t$Plant.trait[799,], 
-  #                                              adj.mat = g, gamma=gamma
-  # )
-  # fact$community.weighted.mean[r] = community.w.mean(mA=model.t[[1]]$Animal.trait[800,],
-  #                                                    mP = model.t[[1]]$Plant.trait[800,],
-  #                                                    Na =  model.t[[1]]$Animals[800,],
-  #                                                    Np = model.t[[1]]$Plants[800,])$cwm_community
-  # 
-  # fact$community.weighted.mean.plants[r] = community.w.mean(mA=model.t[[1]]$Animal.trait[800,],
-  #                                                    mP = model.t[[1]]$Plant.trait[800,],
-  #                                                    Na =  model.t[[1]]$Animals[800,],
-  #                                                    Np = model.t[[1]]$Plants[800,])$cwm_plants
-  # 
-  # 
-  # fact$community.weighted.mean.animals[r] = community.w.mean(mA=model.t[[1]]$Animal.trait[800,],
-  #                                                           mP = model.t[[1]]$Plant.trait[800,],
-  #                                                           Na =  model.t[[1]]$Animals[800,],
-  #                                                           Np = model.t[[1]]$Plants[800,])$cwm_animals
-  # 
-  
- # print(r)
-  
-  
-}
-
-
-
-
-save(outt,file="hysteresis.RData")
-#
-
-
-
 
 
 
@@ -261,9 +104,6 @@ c2<-hyst %>% filter(hysteresis== "no") %>%
   labs(color="")+
   xlab( expression(paste("Avg. mutualistic strength,", gamma[0])))+
   ylab("Richness")
-
-gridExtra::grid.arrange(c1,c2, nrow=1,ncol=2)
-
 
 
 hyst %>% filter(hysteresis== "yes") %>% 
@@ -362,14 +202,99 @@ w6<-ggnet2(net1, mode="circle", size=deg, edge.size = 1,max_size =8, color ="col
 w6
 
 
-#grid::ggarrnge(w6, w1,w2, c1,c2, nrow=2,ncol=3)
-ggpubr::ggarrange(w6,w1,w2,c1,c2,ncol=3,nrow=2,
-                  labels = c("A","B","C","D","E"))
-#18. 28, 
+
+
+#########################################################################################################################
+
+load("Hysteresis_species_data.RData")
+
+
+appender <- function(string) 
+  latex2exp::TeX(paste("$\\gamma_{\\0} = $", string))  
+
+
+(a1<-sp_dat %>% filter(Individual_variation=="high variation", mutualism_strength == 1.8 |
+                         mutualism_strength == 2,
+                       Nestedness < 0.8) %>%
+    group_by(Nestedness,Connectance, forcing_strength,Individual_variation, Network_size , mutualism_strength) %>%
+    summarise(count=n(),
+              count_abundance = mean(abundance),
+              proportion_abundance = count_abundance/count ) %>%
+    ggplot( aes(y = (count_abundance),
+                x = Nestedness,
+                colour = factor(mutualism_strength)))+
+    geom_point(size=5,alpha=0.6)+
+    geom_smooth(method = lm, formula = y ~x, se = F)+
+    theme_classic()+
+    xlab("Nestedness")+scale_color_manual(values=c( "#0072B2", "#D55E00"))+
+    labs(color= expression(paste( gamma[0])))+
+    ylab("Mean pollinator density"))
+# labs(y = expression(paste("Proportion of species with ", N[i] > 0.5 )))+)# nrow = 2,ncol = 4, labeller = as_labeller(appender, default = label_parsed)))
+
+(a2<-sp_dat %>% filter( mutualism_strength > 1.4, Individual_variation == "high variation",mutualism_strength == 1.7 | mutualism_strength == 1.9, Nestedness < 0.8) %>%
+    group_by(Nestedness,Connectance, forcing_strength,
+             Individual_variation, Network_size , mutualism_strength) %>%
+    summarise(count=n(),
+              count_abundance = mean(abundance),
+              proportion_abundance = count_abundance/count ) %>%
+    filter(Network_size < 200) %>% 
+    ggplot( aes(y = (proportion_abundance),
+                x = Nestedness,
+                colour = factor(mutualism_strength)))+
+    geom_point(size=4)+
+    ggtitle("B")+
+    geom_smooth(method = lm, formula = y ~x, se = F,lwd=1.5)+
+    theme_classic()+
+    xlab("Nestedness (NODF)")+
+    labs(color= expression(paste(gamma[0])))+
+    labs(y = expression(paste("Proportion of pollinator species with ", N[i] > 0.5 ))))# nrow = 2,ncol = 4, labeller = as_labeller(appender, default = label_parsed)))
+
+
+load("Empirical_data.RData")
+#all_dat<-rbind(fact2,fact)
+
+
+summary(model1<-lmer(mean_visits~nestedness + Treatment + (1|site) + (1|month), data = all_dat))
+summary(model2<-lmer(mean_visitation_rate~nestedness + Treatment + (1|site) + (1|month), data = all_dat))
 
 
 
-# proportion exhibited hysteresis
+#save(all_dat,file="Empirical_data.RData")
+(g1<-all_dat %>%  ggplot(aes(x=nestedness,y=mean_visits,color = Treatment))+
+    geom_point(size =5,alpha=0.5 )+
+    theme_classic()+
+    xlab("Nestedness")+
+    ggtitle("Seychelles Data")+
+    ylab(expression("Mean pollinator visits per network"))+
+    scale_color_manual(values=c(  "#0072B2", "#D55E00"))+
+    geom_smooth(method = "lm", se=F))
+
+
+
+(g2<-all_dat %>%  ggplot(aes(x=nestedness,y=mean_visitation_rate,color = Treatment))+
+    geom_point(size =5,alpha=0.5 )+
+    theme_classic()+
+    ylim(c(0,6))+
+    xlab("Nestedness")+
+    ggtitle("Seychelles Data")+
+    ylab(expression("Mean visitation rate per network"))+
+    scale_color_manual(values=c(  "#0072B2", "#D55E00"))+
+    geom_smooth(method = "lm", se=F))
+
+
+#Figure 1 
+ggpubr::ggarrange(w6,w1,w2,
+                  a1,g2,g1, labels=c("A","B", "C", "D", "E", "F"), nrow = 2,ncol=3)
+
+
+
+
+
+
+
+
+
+#\############################################# proportion exhibited hysteresis : supplementary figure
 
 for(r in 1 :nrow(hyst)){
 g<-adj.mat(as.character(webfiles[which(webfiles == hyst$web.name[r])])) #network web names
