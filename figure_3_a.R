@@ -61,10 +61,10 @@ webfiles<-as.character(fact_2$web)
 # datasets_1/M_PL_061_17.cs
 
 fact<- expand.grid(`Strength_mutualism`=1.15, 
-                   `web` = "datasets_1/M_PL_045.csv",
+                   `web` = "datasets_1/M_PL_037.csv", #"datasets_1/M_PL_045.csv",
                    mut_strength_perturbation=0, 
                    `forcing_strength`= 0.5,
-                   `forcing_duration`=400,
+                   `forcing_duration`=500,
                    `no_species_forced`=1,
                    `model`="abundance",
                    `interaction_type`= "trade_off", 
@@ -99,7 +99,7 @@ h2 <- runif((Aspecies+Plantspecies),0.4,0.4)
 
 
 ## vector of species trait standard deviations
-N <- runif( (Aspecies+Plantspecies) , 0,1) #mimicking a system with low population density near the collapse state
+N <- runif( (Aspecies+Plantspecies) , 0,0.005) #mimicking a system with low population density near the collapse state
 nainit<-N[1:Aspecies]
 npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
 
@@ -120,12 +120,12 @@ species_index<-index_max_degree
 Amatrix<-mat.comp(g,degree.animals,degree.plants)$Amatrix
 Pmatrix<-mat.comp(g,degree.animals,degree.plants)$Pmatrix
 gamma=0.35#fact_lessvar$Strength_mutualism[r]
-tmax<-500
+tmax<-1200
 nestedness<-nestedness_NODF(g)
 C<-Connectance(g)
 web.name<-fact$web[1]
-ba<-runif(Aspecies, 0.1,0.1)
-bp<-runif(Plantspecies,0.1,0.1)
+ba<-runif(Aspecies, 0,0)
+bp<-runif(Plantspecies,0,0)
 dganimals<-degree.animals
 dgplants<-degree.plants
 
@@ -171,9 +171,11 @@ sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax
     scale_y_continuous(name="population density", limits=c(0, NA)) +
     scale_color_viridis_d()+
     theme(legend.position="none")+
-    annotate("text", x = 350, y = 1.5, label = "gamma[0] == 1.15 + forcing",
+    annotate("text", x = 350, y = 2.35, label = "gamma[0] == 1.15",
              parse = TRUE)+
-    annotate("rect", xmin = 0, xmax = 400, ymin = 0, ymax = 2,
+    annotate("text", x = 750, y = 2.359, label = ", with forcing",
+             parse = FALSE)+
+    annotate("rect", xmin = 0, xmax = 500, ymin = 0, ymax = 2.5,
              alpha = .2))
 
 
@@ -184,7 +186,8 @@ sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax
 
 
 ########## time =50 ###############
-newg_recovery1<-network_structure(Na=(sol1 %>% filter(time==1000,type =="N"))$v ,Np=(sol1 %>% filter(time==50,type =="P"))$v , g=g )
+newg_recovery1<-network_structure(Na=(sol1 %>% filter(time==50,type =="N"))$v ,
+                                  Np=(sol1 %>% filter(time==50,type =="P"))$v , g=g )
 net1 = network(newg_recovery1, directed = FALSE)
 
 
@@ -194,13 +197,13 @@ net1 = network(newg_recovery1, directed = FALSE)
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 #vertex names 
-names<-network.vertex.names(net)
-net %v% "groups" = ifelse( names[1:sum(dim(g))] %in% c( as.character(seq(1:dim(g)[1])) ), "plants", "animals")
-net %v% "color" = ifelse(net %v% "groups" == "plants", "#0072B2", "#E69F00" )
+names<-network.vertex.names(net1)
+net1 %v% "groups" = ifelse( names[1:sum(dim(g))] %in% c( as.character(seq(1:dim(g)[1])) ), "plants", "animals")
+net1 %v% "color" = ifelse(net1 %v% "groups" == "plants", "#0072B2", "#E69F00" )
 #ggnet2(net,  mode="circle",  color ="groups", edge.size = 1,edge.alpha = 1, edge.color = "black", edge.lty = 1)
 
 deg<-c(degree.plants,degree.animals)
-w_h_t_50<-ggnet2(net, mode="circle", size=deg, 
+w_h_t_50<-ggnet2(net1, mode="circle", size=deg, 
                    edge.size = 1.1,max_size =12, 
                    color ="color",edge.alpha = 1, legend.position = "")
 
@@ -209,8 +212,8 @@ w_h_t_50<-ggnet2(net, mode="circle", size=deg,
 
 ############ time = 300 ##############
 
-newg_recovery_t300<-network_structure(Na=(sol1 %>% filter(time==30,type =="N"))$v ,
-                                      Np=(sol1 %>% filter(time==30,type =="P"))$v , g=g )
+newg_recovery_t300<-network_structure(Na=(sol1 %>% filter(time==300,type =="N"))$v ,
+                                      Np=(sol1 %>% filter(time==300,type =="P"))$v , g=g )
 net2 = network(newg_recovery_t300, directed = FALSE)
 
 
@@ -246,7 +249,7 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
 #vertex names 
 names<-network.vertex.names(net3)
 net3 %v% "groups" = ifelse( names[1:sum(dim(g))] %in% c( as.character(seq(1:dim(g)[1])) ), "plants", "animals")
-net3 %v% "color" = ifelse(net %v% "groups" == "plants", "#0072B2", "#E69F00" )
+net3 %v% "color" = ifelse(net3 %v% "groups" == "plants", "#0072B2", "#E69F00" )
 #ggnet2(net,  mode="circle",  color ="groups", edge.size = 1,edge.alpha = 1, edge.color = "black", edge.lty = 1)
 
 deg<-c(degree.plants,degree.animals)
@@ -317,7 +320,7 @@ params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        species_index=species_index,
                        interaction_type=fact$interaction_type[1],
                        na=nainit,np=npinit, duration=duration,
-                       time_func_P=time_func_A,time_func_P=time_func_P)
+                       t1_A=t1_A,t1_P=t1_P)
 
 
 sol<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax, by=1)) %>% 
@@ -329,9 +332,11 @@ sol<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax,
     scale_y_continuous(name="population density", limits=c(0, NA)) +
     scale_color_viridis_d()+
     theme(legend.position="none")+
-    annotate("text", x = 350, y = 1.5, label = "gamma[0] == 1.15 + forcing",
+    annotate("text", x = 350, y = 1.5, label = "gamma[0] == 1.15",
              parse = TRUE)+
-    annotate("rect", xmin = 0, xmax = 400, ymin = 0, ymax = 2,
+    annotate("text", x = 750, y = 1.509, label = ", with forcing",
+             parse = FALSE)+
+    annotate("rect", xmin = 0, xmax = 500, ymin = 0, ymax = 2.5,
              alpha = .2))
 
 
@@ -386,8 +391,8 @@ w_low_t_300<-ggnet2(net2, mode="circle", size=deg,
 
 
 ########### time = 500 ##########
-newg_recovery_t1000<-network_structure(Na=(sol %>% filter(time==1000,type =="N"))$v ,
-                                      Np=(sol %>% filter(time==1000,type =="P"))$v , g=g )
+newg_recovery_t1000<-network_structure(Na=(sol %>% filter(time==750,type =="N"))$v ,
+                                      Np=(sol %>% filter(time==750,type =="P"))$v , g=g )
 net3 = network(newg_recovery_t1000, directed = FALSE)
 
 
