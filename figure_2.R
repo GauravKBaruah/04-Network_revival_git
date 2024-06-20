@@ -142,7 +142,9 @@ load("Upper_bound_abundance_response_time.RData")
     scale_color_viridis_d()+
     theme(legend.position="none")+
     annotate("text", x = 250, y = 0.5, label = "gamma[0] == 1.15",
-             parse = TRUE))
+             parse = TRUE)+
+        annotate("text", x = 465, y = 0.505, label = ", with no forcing",
+                 parse = F) )
     
   ##### the simulation with with forcing  
   N <- runif( (Aspecies+Plantspecies) , 0,0.005) #mimicking a system with low population density near the collapse state
@@ -203,12 +205,14 @@ load("Upper_bound_abundance_response_time.RData")
     scale_y_continuous(name="population density", limits=c(0, NA)) +
     scale_color_viridis_d()+
     theme(legend.position="none")+
-    annotate("text", x = 250, y = 1.5, label = "gamma[0] == 1.15 + forcing",
-                                           parse = TRUE)+
+        annotate("text", x = 250, y = 1.5, label = "gamma[0] == 1.15",
+                 parse = TRUE)+
+        annotate("text", x = 465, y = 1.505, label = ", with forcing",
+                 parse = F)+
     annotate("rect", xmin = 0, xmax = 500, ymin = 0, ymax = 2,
              alpha = .2))
 
-
+  
 ################################for second network plotting for figure 2################################
 #########################################################################################################
     
@@ -285,9 +289,10 @@ load("Upper_bound_abundance_response_time.RData")
       scale_y_continuous(name="population density", limits=c(0, NA)) +
       scale_color_viridis_d()+
       theme(legend.position="none")+
-      annotate("text", x = 250, y = 0.5, label = "gamma[0] == 1.15",
-               parse = TRUE))
-    #annotate("rect", xmin = 0, xmax = 300, ymin = 0, ymax = 0.1,
+        annotate("text", x = 250, y = 0.5, label = "gamma[0] == 1.15",
+                 parse = TRUE)+
+        annotate("text", x = 465, y = 0.505, label = ", with no forcing",
+                 parse = F)) #annotate("rect", xmin = 0, xmax = 300, ymin = 0, ymax = 0.1,
     #        alpha = .2)
     #%>% filter(time == 500)  #%>% plot_all() ## solve ODEs
     
@@ -349,8 +354,10 @@ load("Upper_bound_abundance_response_time.RData")
       scale_y_continuous(name="population density", limits=c(0, NA)) +
       scale_color_viridis_d()+
       theme(legend.position="none")+
-      annotate("text", x = 250, y = 1.5, label = "gamma[0] == 1.15 + forcing",
-               parse = TRUE)+
+        annotate("text", x = 250, y = 1.5, label = "gamma[0] == 1.15",
+                 parse = TRUE)+
+        annotate("text", x = 465, y = 1.505, label = ", with forcing",
+                 parse = F)+
       annotate("rect", xmin = 0, xmax = 500, ymin = 0, ymax = 2,
                alpha = .2))
     
