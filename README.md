@@ -24,3 +24,4 @@ kaiser-bunbury_et_al_2017.html) and was used to produce figure 1E-1F.
 5. `fig3a.R` R script that does the eco-evolutionary simulation to reproduce part of figure 3 (i.e., Figure 3 A-H)
 6. `fig3b.R`  R script that does the eco-evolutionary simulation to reproduce second part of figure 3 (i.e., Figure 3 I-N)
 7. `fig4_5.R` R script to reproduce figure 4 and figure 5. 
+8. `example_hysteresis_simulation.R` is an additional R script that simulates the dynamics of another 44 species network that shows hysteresis for a range of average mutualistic strength based on parameters mentioned in main-text.
