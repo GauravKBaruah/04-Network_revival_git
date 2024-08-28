@@ -1,7 +1,10 @@
+# R script for figure 4 and 5 of main-text.
+
+
 rm(list=ls())
 source("01_ODE_Function.R")
 library(statmod)
-library(cowplot) ## for arranging plots in a grid
+library(cowplot) 
 library(dplyr)
 library(readr)
 library(beepr)
