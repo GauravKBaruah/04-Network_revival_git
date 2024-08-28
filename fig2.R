@@ -1,3 +1,5 @@
+# R script for figure 2 of main-text.
+
 rm(list=ls())
 source("01_ODE_Function.R")
 require(deSolve) ## for integrating ordinary differential equations
@@ -30,12 +32,11 @@ fact<- expand.grid(`Strength_mutualism`=1.15,
 
 load("Mean_trait_data.RData")
 set.seed(1234)
-load("Upper_bound_abundance_response_time.RData")
 
 
   
   g<-adj.mat(myfiles[which(myfiles == fact$web[1])]) #network web names
-  # g<-g[-1,-1] 
+
   
   
   Aspecies<- dim(g)[2] # no of animal species
@@ -54,11 +55,9 @@ load("Upper_bound_abundance_response_time.RData")
     sig <-runif((Aspecies+Plantspecies),0.005,0.005)}else if(fact$individual.variation[1] == "high"){
       sig <-runif((Aspecies+Plantspecies),0.02,0.02)}
   
-
-      h2 <- runif((Aspecies+Plantspecies),0.4,0.4)
+ #mean trait heritabilites
+  h2 <- runif((Aspecies+Plantspecies),0.4,0.4)
   
-  
-  ## vector of species trait standard deviations
   
   N <- runif( (Aspecies+Plantspecies) , 1,1)
   nainit<- N[1:Aspecies]
@@ -81,13 +80,12 @@ load("Upper_bound_abundance_response_time.RData")
   dganimals<-degree.animals
   dgplants<-degree.plants
   mut.strength<-runif((Aspecies+Plantspecies), 1.15,1.15)
-  ic <-c(nainit, npinit, mainit,mpinit)
- tmax=1000
+  ic <-c(nainit, npinit, mainit,mpinit) #initial state values, N, and mean trait
+  tmax=1000
   
   params_noforcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                  Pmatrix=Pmatrix,w=gamma,
                  ic=ic,
-                 dat=dat,
                  individual_variation=fact$individual.variation[1],
                  mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                  web.name=web.name,h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -96,12 +94,13 @@ load("Upper_bound_abundance_response_time.RData")
                  interaction_type=fact$interaction_type[1],
                  na=nainit,np=npinit, duration=0)
   
-  
+  #eco-evo simulations with no forcing, uses the function eqs() in the function R script 01_ODE_Function.R .
   sol1<-ode(func=eqs, y=ic, parms=params_noforcing, times=seq(0, tmax, by=1)) %>% 
     organize_results(pars = params_noforcing) 
-    
-  
-    (netwr_no_forcing_hvar_n1<-sol1 %>% filter(type != "ma", type != "mp") %>% 
+
+
+# plotting of the density timeseries
+(netwr_no_forcing_hvar_n1<-sol1 %>% filter(type != "ma", type != "mp") %>% 
     ggplot +
     geom_line(aes(x=time, y=v, colour = factor(species)),size=2) +
     scale_y_continuous(name="population density", limits=c(0, NA)) +
@@ -109,8 +108,10 @@ load("Upper_bound_abundance_response_time.RData")
     theme(legend.position="none")+
     annotate("text", x = 250, y = 0.5, label = "gamma[0] == 1.15",
              parse = TRUE))
+
+
     
-  ##### the simulation with with forcing  
+  ##### the simulation with with forcing  #############
   N <- runif( (Aspecies+Plantspecies) , 0,0.005) #mimicking a system with low population density near the collapse state
   nainit<-N[1:Aspecies]
   npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
@@ -131,7 +132,7 @@ load("Upper_bound_abundance_response_time.RData")
   mut.strength[index_max_degree]<- fact$Strength_mutualism[1] 
   time_range<-c(0,tmax)
   deltat<- (time_range[2]-time_range[1])/1 + 1
-  duration <- 500#fact$forcing_duration[1]
+  duration <- 500      # forcing duration of 500  
   d<- c(rep(1,duration),rep(0,(deltat-duration)))
   duration_mat_A<-(replicate(Aspecies,d))
   duration_mat_P<-(replicate(Plantspecies,d))
@@ -142,13 +143,12 @@ load("Upper_bound_abundance_response_time.RData")
   t1_P$import<-duration_mat_P[,1]
   #time_func_A<-approxfun(t1_A, method="linear", rule =2)
   #time_func_P<-approxfun(t1_P, method="linear", rule =2)
-  forcing_strength <- rep(fact$forcing_strength[1], (Aspecies+Plantspecies))
+  forcing_strength <- rep(fact$forcing_strength[1], (Aspecies+Plantspecies)) #forcing strength of 0.5
   ic_f<-c(nainit, npinit, mainit,mpinit)
   
   params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                            Pmatrix=Pmatrix,w=gamma,
                            ic=ic_f,
-                           dat=dat,
                            individual_variation=fact$individual.variation[1],
                            mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                            web.name=web.name,h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -159,7 +159,8 @@ load("Upper_bound_abundance_response_time.RData")
                            na=nainit,np=npinit, duration=duration,
                          t1_A=t1_A,t1_P=t1_P)
   
-  
+
+#uses eqs_perturbation() in the function R script 01_ODE_Function.R  for eco-evo simulations with species specific perturbation
   sol<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax, by=1)) %>% 
     organize_results(pars = params_forcing)#%>% plot_all() ## solve ODEs
   
@@ -180,7 +181,7 @@ load("Upper_bound_abundance_response_time.RData")
     
     
     (g<-adj.mat(myfiles[which(myfiles == fact$web[51])])) #network web names
-    # g<-g[-1,-1] 
+
     
     Aspecies<- dim(g)[2] # no of animal species
     Plantspecies<- dim(g)[1] # no of plant species
@@ -202,7 +203,6 @@ load("Upper_bound_abundance_response_time.RData")
     h2 <- runif((Aspecies+Plantspecies),0.4,0.4)
     
     
-    ## vector of species trait standard deviations
     
     N <- runif( (Aspecies+Plantspecies) , 1,1)
     nainit<- N[1:Aspecies]
@@ -240,7 +240,9 @@ load("Upper_bound_abundance_response_time.RData")
                              interaction_type=fact$interaction_type[1],
                              na=nainit,np=npinit, duration=0)
     
-    
+
+#eco-evo simulations with no forcing, uses the function eqs() in the function R script 01_ODE_Function.R .
+ 
     sol2<-ode(func=eqs, y=ic, parms=params_noforcing, times=seq(0, tmax, by=1)) %>% 
       organize_results(pars = params_noforcing) 
     
@@ -305,7 +307,9 @@ load("Upper_bound_abundance_response_time.RData")
                            na=nainit,np=npinit, duration=duration,
                            t1_A=t1_A,t1_P=t1_P)
     
-    
+
+#uses eqs_perturbation() in the function R script 01_ODE_Function.R  for eco-evo simulations with species specific perturbation
+
     sol3<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax, by=1)) %>% 
       organize_results(pars = params_forcing)#%>% plot_all() ## solve ODEs
     
