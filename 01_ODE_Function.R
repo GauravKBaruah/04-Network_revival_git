@@ -769,6 +769,26 @@ mat.comp<-function(matrix){
 }
 
 
+               
+
+# function for sampling competitive coefficients from random uniform distribution 
+# matrix: network of interactions which are 0 or 1. 
+# strength: average competition strength
+mat.comp<-function(matrix,degree.animals,degree.plants){
+  Aspecies<- dim(matrix)[2]
+  Plantspecies<- dim(matrix)[1]
+  
+  Amatrix<-matrix(runif(Aspecies^2, 0.0001, 0.0005), nrow=Aspecies, ncol = Aspecies)
+  diag(Amatrix)<-1
+  #diag(Amatrix)<-  diag(Amatrix) #/degree.animals
+  
+  Pmatrix<-matrix(runif(Plantspecies^2, 0.0001, 0.0005), nrow=Plantspecies, ncol = Plantspecies)
+  diag(Pmatrix)<-1
+  #diag(Pmatrix)<-2-  diag(Pmatrix)/degree.plants
+  out<-return(list(Amatrix=Amatrix,Pmatrix=Pmatrix))
+  
+}
+
 
 
 # function for sampling competitive coefficients from exponential distribution 
