@@ -1,6 +1,10 @@
 
 ### This appendix folder contains the Rscripts, and data used for producing the figures in the supplementary appendix data.
 
+# Repository for the paper titled "Reviving collapsed plant-pollinator networks from a single species."
+Authors: Gaurav Baruah, Meike Wittmann
+For Journal: PLOS Biology
+
 
 The codes and R scripts are prepared by Gaurav Baruah.
 
