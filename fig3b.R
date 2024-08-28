@@ -1,8 +1,11 @@
+# R script for second part of figure 3 of main-text.
+
+
 rm(list=ls())
 source("01_ODE_Function.R")
 library(statmod)
-require(deSolve) ## for integrating ordinary differential equations
-library(cowplot) ## for arranging plots in a grid
+require(deSolve) 
+library(cowplot) 
 library(dplyr)
 library(beepr)
 library(viridis)
@@ -17,7 +20,7 @@ require(akima)
 
 theme_set(theme_classic()) 
 
-
+#path directory for empirical plant-pollinator network data matrices
 mydir = 'datasets_1'
 myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
 #myfiles<-myfile
