@@ -1,11 +1,10 @@
-#code for Ecology Letters paper: 
-#" The impact of individual variation on abrupt collapses in mutualistic networks" 2021. Gaurav Baruah
+#Functions used in the paper " Reviving collapsed plant-polliantor networks from a single species" 2024. Gaurav Baruah & Meike Witmann. Some of these functions are borrowed from various open access codes and Rscripts
+#including Baruah 2022 Eco. Letts paper.
 #email: gbaruahecoevo@gmail.com
+
 require(statmod)
 
 cutoff <- function(x) ifelse(x<1, (1*(x>0))*(x*x*x*(10+x*(-15+6*x))), 1)
-
-
 
 network_structure<-function(Na,Np, g ){
   new_g<- matrix(0, nrow= length(Np), ncol =length(Na) )
@@ -25,7 +24,7 @@ network_structure<-function(Na,Np, g ){
 }
 
 
-#conversion to a matrix
+#conversion of .csv incidence adjacency matrices to a matrix format of plant-pollinator networks
 adj.mat<-function(data){
   #dat <- paste('network.csv',sep='')
   d <- read.csv(file=data,header=FALSE )
@@ -49,7 +48,7 @@ trait.matching<-function(mA,mP,adj.mat_1,gamma){
 
 
 
-#gaussian quadrature approximation used to numerically determine the integrals.
+#gaussian quadrature approximation used to numerically determine the integrals used in the paper 
 gausquad.animals<-function(m,sigma,w,h,np,na,mut.strength,points,mat,degree.animal,interaction_type){
   
   
@@ -162,11 +161,6 @@ gausquad.plants<-function(m,sigma,w,h,np,na,mut.strength,points,mat,degree.plant
         
         temp2[i]<- sum(na*(mut.strength/degree.plant)*f/(1+h*na*(mut.strength/degree.plant)*f)*w2*w1[i])
         
-        #temp2[i]<- sum(exp(-(z1[i]- z2)^2/w^2)*w2*w1[i])
-        #x2[i]<- sum(h*w2*f)
-        #x3[i]<-sum(h*exp(-(z1[i]-z2)^2/w^2)*w2)
-        #dat2[i]<- sum((z1[i]-m$mp)*(exp(-(z1[i]- z2)^2/w^2)*w2*w1[i]))
-        
         dat2[i]<- sum( ((z1[i]-m$mp)*f*(mut.strength/degree.plant)*na/(1+h*na*(mut.strength/degree.plant)*f) )*w2*w1[i])
         
         # x4[i]<-sum(h*w2*exp(-(z1[i]-z2)^2/w^2))
@@ -193,11 +187,7 @@ gausquad.plants<-function(m,sigma,w,h,np,na,mut.strength,points,mat,degree.plant
         f <-  exp(-(z1[i]- z2)^2/w^2) # + 2*alpha*(sign(z1[i] - z2))*(1- exp(-(z1[i]-z2)^2/w^2)) + sign(alpha))
         
         temp2[i]<- sum(na*(mut.strength)*f/(1+h*na*(mut.strength)*f)*w2*w1[i])
-        
-        #temp2[i]<- sum(exp(-(z1[i]- z2)^2/w^2)*w2*w1[i])
-        #x2[i]<- sum(h*w2*f)
-        #x3[i]<-sum(h*exp(-(z1[i]-z2)^2/w^2)*w2)
-        #dat2[i]<- sum((z1[i]-m$mp)*(exp(-(z1[i]- z2)^2/w^2)*w2*w1[i]))
+
         
         dat2[i]<- sum( ((z1[i]-m$mp)*f*(mut.strength)*na/(1+h*na*(mut.strength)*f) )*w2*w1[i])
         
@@ -217,6 +207,10 @@ gausquad.plants<-function(m,sigma,w,h,np,na,mut.strength,points,mat,degree.plant
 }
 
 
+# this is the function that numerically simulates the eco-evo dynamics of plant-pollinator networks without any species specific perturbation
+#time: time
+#state: initial state values
+#pars: list of parameters
 
 eqs <- function(time, state, pars) {
   A <- dim(pars$matrix)[2]  ## number of animal species
@@ -283,7 +277,10 @@ eqs <- function(time, state, pars) {
 }
 
 
-
+# this is the function that numerically simulates the eco-evo dynamics of plant-pollinator networks WITH  species specific perturbation
+#time: time
+#state: initial state values
+#pars: list of parameters
 eqs_perturbation <- function(t, state, pars) {
   A <- dim(pars$matrix)[2]  ## number of animal species
   P <-dim(pars$matrix)[1]
@@ -342,9 +339,7 @@ eqs_perturbation <- function(t, state, pars) {
     }
     aj[k]<-sum(aji[k,])
     bj[k]<-sum(bji[k,])
-  }
-  #print(t)
-  
+  }  
   
   
   dndt_a<- Na*(pars$ba-alpha.a%*%Na+ai+forcing_index_sp_A*forcing_strength_A*e_A)*cutoff(Na/(1e-8))  #  na*(ba-alpha.a%*%na+ai)*cutoff(na/(1e-8)) #population dynamics
@@ -358,7 +353,10 @@ eqs_perturbation <- function(t, state, pars) {
 
 
 
-
+# this is the function that numerically simulates the eco-evo dynamics of plant-pollinator networks WITH species specific perturbation but a specific density and not rate
+#time: time
+#state: initial state values
+#pars: list of parameters
 eqs_perturbation_c <- function(t, state, pars) {
   A <- dim(pars$matrix)[2]  ## number of animal species
   P <-dim(pars$matrix)[1]
@@ -386,6 +384,8 @@ eqs_perturbation_c <- function(t, state, pars) {
   forcing_index[pars$species_index]<-1
   forcing_index_sp_A<-forcing_index[1:A]
   forcing_index_sp_P<-forcing_index[(A+1):(A+P)]
+
+  #mutualistic strength of animals on plants
   for(r in 1:A){
     for(l in 1:P){
       #
@@ -403,6 +403,8 @@ eqs_perturbation_c <- function(t, state, pars) {
     ai[r]<-sum(aij[r,])
     bi[r]<-sum(bij[r,])
   }
+
+  #mutualistic strength of plants on animals
   for(k in 1:P){
     for(m in 1:A){
       m2.temp<-list(ma=muA[m],mp=muP[k])
@@ -418,7 +420,7 @@ eqs_perturbation_c <- function(t, state, pars) {
     aj[k]<-sum(aji[k,])
     bj[k]<-sum(bji[k,])
   }
-  #print(t)
+
   
   
   
@@ -433,8 +435,14 @@ eqs_perturbation_c <- function(t, state, pars) {
 
 
 
-
-cluster_run_func<-function(params_forcing, ic_f, tmax ){
+# this function is designed for the THEOBIOTA cluster at University of Bielefeld.
+#this function includes 
+#params_Forcing: list of parameters
+# ic_f : initlat state variables
+#tmax - max time
+# also includes ode solver and uses the above eqs_perturbation() function to simulate eco-evo dynamics with species specific forcing and
+# lets out recovery species richness at max time point, biomass, degree, nestedness, connectance etc. 
+ cluster_run_func<-function(params_forcing, ic_f, tmax ){
   
   
   sol<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax, by=1)) %>% 
@@ -535,6 +543,8 @@ cluster_run_func<-function(params_forcing, ic_f, tmax ){
   return(final_output)
   
 }
+
+
 ## Organize simulation results into tidy table (code adapted from Barabas and D'Andrea 2016 Eco.Letts paper)
 ## Input:
 ## - sol: output produced by the function ode()
@@ -601,20 +611,6 @@ plot_density<- function(dat) {
 }
 
 
-#lay out function for multiple plots
-lay_out = function(...) {    
-  x <- list(...)
-  n <- max(sapply(x, function(x) max(x[[2]])))
-  p <- max(sapply(x, function(x) max(x[[3]])))
-  grid::pushViewport(grid::viewport(layout = grid::grid.layout(n, p)))    
-  
-  for (i in seq_len(length(x))) {
-    print(x[[i]][[1]], vp = grid::viewport(layout.pos.row = x[[i]][[2]], 
-                                           layout.pos.col = x[[i]][[3]]))
-  }
-} 
-
-
 
 #multiplot of ggplot2 figures with a common shared legend. Code taken from :https://rpubs.com/sjackman/grid_arrange_shared_legend
 grid_arrange_shared_legend <- function(..., ncol, nrow, position = c("bottom", "right")) {
@@ -643,7 +639,7 @@ grid_arrange_shared_legend <- function(..., ncol, nrow, position = c("bottom", "
 }
 
 
-# plots the density distribution  at a particular timepoint. This function was used to produce figure 1.
+# plots the density distribution  at a particular timepoint.
 # Na: Abundance of animals at equilibrium
 # Np: Abundance of plants at equilibrium
 # m: mean traits at equilibrium
@@ -773,20 +769,6 @@ mat.comp<-function(matrix){
 }
 
 
-mat.comp<-function(matrix,degree.animals,degree.plants){
-  Aspecies<- dim(matrix)[2]
-  Plantspecies<- dim(matrix)[1]
-  
-  Amatrix<-matrix(runif(Aspecies^2, 0.0001, 0.0005), nrow=Aspecies, ncol = Aspecies)
-  diag(Amatrix)<-1
-  #diag(Amatrix)<-  diag(Amatrix) #/degree.animals
-  
-  Pmatrix<-matrix(runif(Plantspecies^2, 0.0001, 0.0005), nrow=Plantspecies, ncol = Plantspecies)
-  diag(Pmatrix)<-1
-  #diag(Pmatrix)<-2-  diag(Pmatrix)/degree.plants
-  out<-return(list(Amatrix=Amatrix,Pmatrix=Pmatrix))
-  
-}
 
 
 # function for sampling competitive coefficients from exponential distribution 
@@ -857,7 +839,7 @@ feasibility_plot<-function(dat){
   return(a)
 }
 
-
+####### MISCELLANEOUS FUNCTIONS not used in the manuscript ####################
 
 
 #response time for each species in a network
@@ -928,8 +910,6 @@ response_time<-function(sol, Aspecies, Plantspecies, g, t , dat, webname){
 
 
 # final state after perturbation
-
-
 final_state<-function(forcing_time ){
   
   
