@@ -1,22 +1,25 @@
 rm(list=ls())
+
+#load libraries and functions related to this R script.
+
 source("01_ODE_Function.R")
 library(statmod)
-require(deSolve) ## for integrating ordinary differential equations
+require(deSolve) 
 library(dplyr)
 library(beepr)
 library(GGally)
 library(network)
 library(sna)
-library(ggplot2)
-library(gganimate)
 
 set.seed(1234)
+
+#set directory of all the empirical plant-pollinator network incidence data matrices
 mydir = 'datasets_1'
 myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
 #myfiles<-myfile
 newfiles<-myfiles[1:153]
-load("Mean_trait_data.RData")
 
+#create an empty data frame where different parameters could be varied and state variables could be stored.
 fact<- expand.grid(`Strength_mutualism`=seq(0.8,2.5,0.1), 
                    `web` ="datasets_1/M_PL_045.csv",
                    hysteresis=c("yes","no"), 
@@ -29,10 +32,12 @@ fact<- expand.grid(`Strength_mutualism`=seq(0.8,2.5,0.1),
                    `random_seed`=4327+(1:1)*100) %>%
   as_tibble()
 
+#loop over the empty dataframe
 for(r in 1:nrow(fact)){
 
+  #adjacency matrix
 g<-adj.mat(myfiles[which(myfiles == fact$web[r])]) #network web names
-# g<-g[-1,-1] 
+
 
 
 Aspecies<- dim(g)[2] # no of animal species
@@ -50,20 +55,21 @@ for(j in 1:Aspecies){
 sig <-runif((Aspecies+Plantspecies),0.005,0.005)
 
 
-## vector of species trait standard deviations
+## control loop of whether the simulation is for the collapse regime or hysteresis regime
 if(fact$hysteresis[r] == "yes"){
-N <- runif( (Aspecies+Plantspecies) , 0,0.005)
+N <- runif( (Aspecies+Plantspecies) , 0,0.005) # #mimicking a system with low population density near the collapse state
 }else{
   N <- runif( (Aspecies+Plantspecies) , 1,1)
-} #mimicking a system with low population density near the collapse state
+}
+  
 nainit<-N[1:Aspecies]
 npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
 
-index_m<-which(names(trait_data_list)==fact$web[1])
-
-ma<-  runif((Aspecies+Plantspecies), -0.5, 0.5) #(outt %>% filter(webname == fact$web[1]))$m
+#randomly sample mean trait values bounded between -0.5,0.5
+ma<-  runif((Aspecies+Plantspecies), -0.5, 0.5) 
 mainit<-ma[1:Aspecies]
 mpinit<-ma[(Aspecies+1): (Aspecies+Plantspecies)]
+  
 index_maxdegree_animal<-which(degree.animals == max(degree.animals))
 index_maxdegree_plants<-which(degree.plants == max(degree.plants))
 
@@ -73,21 +79,23 @@ index_max_degree<-which(degree.vector == max(degree.vector))
 species_index<-index_max_degree
 Amatrix<-mat.comp(g,degree.animals,degree.plants)$Amatrix
 Pmatrix<-mat.comp(g,degree.animals,degree.plants)$Pmatrix
-gamma=0.35#fact_lessvar$Strength_mutualism[r]
-tmax<-1000
-nestedness<-nestedness_NODF(g)
-C<-Connectance(g)
-web.name<-fact$web[1]
-ba<-runif(Aspecies, 0.,0.)
-bp<-runif(Plantspecies,0.,0.)
+gamma=0.35
+tmax<-1000 #total time point for simulation
+nestedness<-nestedness_NODF(g) #nestedness calculation
+C<-Connectance(g) #connectance calculation
+web.name<-fact$web[1] #name of the web
+ba<-runif(Aspecies, 0.,0.) #all zero growth rate, b
+bp<-runif(Plantspecies,0.,0.) # zero growth rate for plants, b
 dganimals<-degree.animals
 dgplants<-degree.plants
-fact$Strength_mutualism[1]<-fact$Strength_mutualism[r]
+fact$Strength_mutualism[1]<-fact$Strength_mutualism[r] #gamma_0 or average mutualistic strength
 mut.strength<-runif((Aspecies+Plantspecies), fact$Strength_mutualism[1],fact$Strength_mutualism[1])
 mut.strength[index_max_degree]<- fact$Strength_mutualism[1] 
+  
+#this below lines are if you want to add species specific perturbation, which we dont do in this Rscript  
 time_range<-c(0,tmax)
 deltat<- (time_range[2]-time_range[1])/1 + 1
-duration <- fact$forcing_duration[1]<- 0
+duration <- fact$forcing_duration[1]<- 0 #duration of the perturbation which is zero here.
 d<- c(rep(1,duration),rep(0,(deltat-duration)))
 duration_mat_A<-(replicate(Aspecies,d))
 duration_mat_P<-(replicate(Plantspecies,d))
@@ -96,10 +104,11 @@ t1_A<-as.data.frame(list(times=times, import = rep(0,length(times))))
 t1_P<-as.data.frame(list(times=times, import = rep(0,length(times))))
 t1_A$import<-duration_mat_A[,1]
 t1_P$import<-duration_mat_P[,1]
-fact$forcing_strength[1]<-0
-forcing_strength <- rep(0, (Aspecies+Plantspecies))# rep(fact$forcing_strength[1], (Aspecies+Plantspecies))
-ic_f<-c(nainit, npinit, mainit,mpinit)
+fact$forcing_strength[1]<-0 #forcing strenght is zero here in this example hystereis simulation
+forcing_strength <- rep(0, (Aspecies+Plantspecies))# zero species specific forcing strength here.
+ic_f<-c(nainit, npinit, mainit,mpinit) #initial N, and mean trait values
 
+  #list of variables
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
@@ -113,12 +122,12 @@ params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        na=nainit,np=npinit, duration=duration,
                        t1_A=t1_A,t1_P=t1_P)
 
-
+  #solving eco-evo dynamics
 sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax, by=1)) %>% 
-  organize_results(pars = params_forcing)#%>% plot_all() ## solve ODEs
+  organize_results(pars = params_forcing)
 
 
-
+#plotting N for all speices
 (netwr_forcing_lvar<-sol1 %>% filter(type != "ma", type != "mp") %>% 
     ggplot +
     geom_line(aes(x=time, y=v, colour = factor(species)),size=2) +
@@ -136,6 +145,7 @@ sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax
              alpha = .2))
 
 print(netwr_forcing_lvar)
+  
 proportion_richness<-length(which((sol1 %>% filter(time == tmax, type %in%c("N","P")))$v>0.5))/(Aspecies+Plantspecies)
 richness<-length(which((sol1 %>% filter(time == tmax, type %in%c("N","P")))$v>0.5))
 
