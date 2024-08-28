@@ -1,7 +1,8 @@
+# R script for part of figure 3 of main-text.
 rm(list=ls())
 source("01_ODE_Function.R")
 library(statmod)
-require(deSolve) ## for integrating ordinary differential equations
+require(deSolve) 
 library(dplyr)
 library(beepr)
 library(GGally)
@@ -9,12 +10,15 @@ library(network)
 library(sna)
 library(ggplot2)
 set.seed(1234)
+
+#path for all the empirical incidence plant-pollinator matrices
 mydir = 'datasets_1'
 myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
 #myfiles<-myfile
 newfiles<-myfiles[1:153]
 
 
+#empty data frame
 fact<- expand.grid(`Strength_mutualism`=1.15, 
                    `web` = "datasets_1/M_PL_037.csv", #"datasets_1/M_PL_045.csv",
                    mut_strength_perturbation=0, 
@@ -27,13 +31,12 @@ fact<- expand.grid(`Strength_mutualism`=1.15,
                    `random_seed`=4327+(1:1)*100) %>%
   as_tibble()
 
-new_ddf<-NULL
 load("Mean_trait_data.RData")
 
 
 
 g<-adj.mat(myfiles[which(myfiles == fact$web[1])]) #network web names
-# g<-g[-1,-1] 
+
 
 
 Aspecies<- dim(g)[2] # no of animal species
@@ -52,7 +55,6 @@ sig <-runif((Aspecies+Plantspecies),0.02,0.02)
 h2 <- runif((Aspecies+Plantspecies),0.4,0.4)
 
 
-## vector of species trait standard deviations
 N <- runif( (Aspecies+Plantspecies) , 0,0.005) #mimicking a system with low population density near the collapse state
 nainit<-N[1:Aspecies]
 npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
@@ -72,7 +74,7 @@ index_max_degree<-which(degree.vector == max(degree.vector))
 species_index<-index_max_degree
 Amatrix<-mat.comp(g,degree.animals,degree.plants)$Amatrix
 Pmatrix<-mat.comp(g,degree.animals,degree.plants)$Pmatrix
-gamma=0.35#fact_lessvar$Strength_mutualism[r]
+gamma=0.35
 tmax<-1200
 nestedness<-nestedness_NODF(g)
 C<-Connectance(g)
@@ -95,7 +97,7 @@ t1_A<-as.data.frame(list(times=times, import = rep(0,length(times))))
 t1_P<-as.data.frame(list(times=times, import = rep(0,length(times))))
 t1_A$import<-duration_mat_A[,1]
 t1_P$import<-duration_mat_P[,1]
-forcing_strength <- rep(fact$forcing_strength[1], (Aspecies+Plantspecies))
+forcing_strength <- rep(fact$forcing_strength[1], (Aspecies+Plantspecies)) 
 ic_f<-c(nainit, npinit, mainit,mpinit)
 
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
@@ -111,7 +113,7 @@ params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        na=nainit,np=npinit, duration=duration,
                        t1_A=t1_A,t1_P=t1_P)
 
-
+# eco-evo dynamics with perturbation on most generalist species
 sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax, by=1)) %>% 
   organize_results(pars = params_forcing)#%>% plot_all() ## solve ODEs
 
