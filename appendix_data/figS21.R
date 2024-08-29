@@ -17,6 +17,7 @@ library(sna)
 library(akima)
 theme_set(theme_classic()) 
 
+
 load("S_targeted_degree_data.RData")
 ############################## NETWORK NO 1  nad perturbation regime of random ####################################
 web1<- fact %>% filter(web == "datasets_1/M_PL_060_11.csv",individual.variation=="high",perturbation == "degree")
