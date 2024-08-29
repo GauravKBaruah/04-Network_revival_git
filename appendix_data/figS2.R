@@ -19,10 +19,6 @@ myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
 #myfiles<-myfile
 newfiles<-myfiles[1:154]
 
-
-#load("04_figure_data_1.RData")
-
-
 load("fig_S2.RData")
 
 (sfig_1<-net_dat %>% filter(forcing_strength == 0.5, mut_strength<1.4) %>% 
