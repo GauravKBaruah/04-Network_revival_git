@@ -46,9 +46,6 @@ fact<- expand.grid(`web` =webfiles,
                    `random_seed`=4327+(1:1)*100) %>%
   as_tibble  
 
-
-out<-NULL
-load("Upper_bound_abundance_response_time.RData")
 for(r in 1:nrow(fact)){
   
   g<-adj.mat(myfiles[which(myfiles == fact$web[r])]) #network web names
