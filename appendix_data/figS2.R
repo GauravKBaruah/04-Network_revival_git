@@ -25,15 +25,6 @@ newfiles<-myfiles[1:154]
 
 load("fig_S2.RData")
 
-sp_dat<-net_dat<-NULL
-for(i in 1:1472){
-  
-  sp_dat<-rbind(sp_dat,outt[[i]]$ddf)
-  net_dat<-rbind(net_dat,outt[[i]]$output)
-  
-}
-
-
 (sfig_1<-net_dat %>% filter(forcing_strength == 0.5, mut_strength<1.4) %>% 
     ggplot(aes(x=Nestedness, y = recovery_richness, color= factor(mut_strength)))+
     geom_point(position=position_jitter(height=0.0,width=0.0),
