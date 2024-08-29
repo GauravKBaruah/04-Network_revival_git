@@ -23,13 +23,8 @@ myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
 #myfiles<-myfile
 newfiles<-myfiles[1:154]
 
-load("gaussian_width.RData")
-net_dat<-sp_dat<-NULL
-for(i in 1:4416){
-  net_dat <- rbind(net_dat,outt[[i]]$output)
-  sp_dat <- rbind(sp_dat, outt[[i]]$ddf)
-  
-}
+load("gaussian_width_net.RData")
+
 require(deSolve) ## for integrating ordinary differential equations
 require(tidyverse) ## for efficient data manipulation & plotting
 require(cowplot) ## for arranging plots in a grid
