@@ -1,6 +1,5 @@
 rm(list=ls())
 
-
 load("init_trait_dist_net.RData")
 require(cowplot) ## for arranging plots in a grid
 library(dplyr)
