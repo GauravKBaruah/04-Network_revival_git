@@ -1,5 +1,5 @@
 
-### This appendix folder contains the Rscripts, and data used for producing the figures in the supplementary appendix data.
+### This appendix folder contains the Rscripts, and data used for producing the figures in the supplementary appendix S1 text.
 
 # Repository for the paper titled "Reviving collapsed plant-pollinator networks from a single species."
 Authors: Gaurav Baruah, Meike Wittmann
@@ -38,7 +38,9 @@ All the other simualted data that are used to reproduce all the supplementary ad
 
 
 
-#### R scripts: All these R scripts are R code that are used to reproduce all the supplementary document figures using the `.RData` used above. The name of the R script executes the respective figure in the supplementary document. For example, `figS3_S4.R` reproduces figure S3 and figure S4 in the supplementary document.
+#### R scripts: All these R scripts are R code that are used to reproduce all the supplementary document figures using the `.RData` used above. 
+
+# The name of the R script executes the respective figure in the supplementary document S1 text. For example, `figS3_S4.R` reproduces figure 3 and figure 4 in the supplementary document, or `figS8.R` reproduces Figure 8 in S1 text
 
 1. `figS1.R`
 2. `figS2.R`
