@@ -47,22 +47,7 @@ fact_2 <- fact_2 %>% filter(network_size < 185 )
 webfiles<-fact_2$web
 
 
-# fact<- expand.grid(`Strength_mutualism`=1.15, 
-#                    `web` = c( webfiles[70], webfiles[3]),
-#                    `forcing_strength`= 0.5,
-#                    `forcing_duration`=500,
-#                    `no_species_forced`=1,
-#                     h2=0.4,
-#                    `model`="abundance",
-#                    `interaction_type`= "trade_off", #no_trade_off
-#                     interaction,
-#                    `individual.variation` = c("high"),
-#                    `random_seed`=4327+(1:1)*100) %>%
-#   as_tibble  
 
-
-new_ddf<-NULL
-load("Upper_bound_abundance_response_time.RData")
 
 
   g<-adj.mat(myfiles[which(myfiles == "datasets_1/M_PL_061_01.csv")]) #network web names
@@ -116,9 +101,8 @@ load("Upper_bound_abundance_response_time.RData")
   
   params_nforcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                          Pmatrix=Pmatrix,w=width,
-                         ic=ic_f,
+                         ic=ic,
                          w1=0.1,
-                         dat=dat,
                          individual_variation="high",
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -127,8 +111,7 @@ load("Upper_bound_abundance_response_time.RData")
                          species_index=species_index,
                          interaction_type="trade_off",
                          interaction="assym",
-                         na=nainit,np=npinit, duration=duration,t1_A=t1_A,
-                         t1_P=t1_P)
+                         na=nainit,np=npinit, duration=0)
   
   #no forcing simulations
   sol1<-ode(func=eqs, y=ic, parms=params_nforcing, times=seq(0, tmax, by=1)) %>% 
@@ -146,7 +129,7 @@ load("Upper_bound_abundance_response_time.RData")
 
   
   ################# forcing of 0.5 for a duration of 500 time points with assymetric interaction kernel #################
-  N <- runif( (Aspecies+Plantspecies) ,0,0.005 )
+  N <- runif( (Aspecies+Plantspecies) ,1,1 )
   nainit<- N[1:Aspecies]
   npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
   mainit<-(sol1 %>% filter(type == "ma", time==tmax))$v
@@ -174,7 +157,6 @@ load("Upper_bound_abundance_response_time.RData")
                           Pmatrix=Pmatrix,w=width,
                           ic=ic_f,
                           w1=0.1,
-                          dat=dat,
                           individual_variation="high",
                           mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                           web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -206,8 +188,12 @@ load("Upper_bound_abundance_response_time.RData")
   
   
   ############# forcing of 0.5 for 500 time points ###################
-  ic_f<- c(nainit, npinit, mainit,mpinit)
+   N <- runif( (Aspecies+Plantspecies) ,0,0.005 )
+  nainit<- N[1:Aspecies]
+  npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
   
+  ic_f<- c(nainit, npinit, mainit,mpinit)
+ 
   forcing_strength <- rep(0.5, (Aspecies+Plantspecies))
   strength_mutualism<- 1.2
   mut.strength<-runif((Aspecies+Plantspecies), strength_mutualism,strength_mutualism)
@@ -219,7 +205,6 @@ load("Upper_bound_abundance_response_time.RData")
                          Pmatrix=Pmatrix,w=width,
                          ic=ic_f,
                          w1=0.1,
-                         dat=dat,
                          individual_variation="high",
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -263,7 +248,6 @@ load("Upper_bound_abundance_response_time.RData")
                          Pmatrix=Pmatrix,w=width,
                          ic=ic_f,
                          w1=0.1,
-                         dat=dat,
                          individual_variation="high",
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -309,7 +293,6 @@ load("Upper_bound_abundance_response_time.RData")
                          Pmatrix=Pmatrix,w=width,
                          ic=ic_f,
                          w1=0.1,
-                         dat=dat,
                          individual_variation="high",
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -354,7 +337,6 @@ load("Upper_bound_abundance_response_time.RData")
                          Pmatrix=Pmatrix,w=width,
                          ic=ic_f,
                          w1=0.1,
-                         dat=dat,
                          individual_variation="high",
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
@@ -400,7 +382,6 @@ load("Upper_bound_abundance_response_time.RData")
                          Pmatrix=Pmatrix,w=width,
                          ic=ic_f,
                          w1=0.1,
-                         dat=dat,
                          individual_variation="high",
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name="datasets_1/M_PL_061_01.csv",h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
