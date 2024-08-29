@@ -1,15 +1,7 @@
 rm(list=ls())
 source("01_ODE_Function.R", echo=F)
 
-load("S_targeted_degree_data.RData")
-
-
-
-net_dat<-sp_dat<-NULL
-for(i in 1:3312){
- net_dat<-rbind(net_dat, outt[[i]]$output)
- print(i)
-}
+load("S_targeted_degree_random_net.RData")
 
 #save(net_dat,file="S_targeted_random_degree.RData")
 require(deSolve) ## for integrating ordinary differential equations
