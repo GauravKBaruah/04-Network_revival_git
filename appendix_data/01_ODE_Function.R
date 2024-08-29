@@ -767,25 +767,6 @@ mat.comp<-function(matrix,degree.animals,degree.plants){
 }
 
 
-# function for sampling competitive coefficients from random uniform distribution 
-# competitive interactions  were scaled by the total number of species within a guild as Dakos & Bascompte 2014 PNAS.
-# matrix: network of interactions which are 0 or 1. 
-# strength: average competition strength
-
-mat.comp<-function(matrix){
-  Aspecies<- dim(matrix)[2]
-  Plantspecies<- dim(matrix)[1]
-  
-  Amatrix<-matrix(runif(Aspecies^2, 0.0001, 0.001), nrow=Aspecies, ncol = Aspecies)/Aspecies #scaled by number of competitors within a guild
-  diag(Amatrix)<-1 #intraspecific competition for animals
-  Pmatrix<-matrix(runif(Plantspecies^2, 0.0001, 0.001), nrow=Plantspecies, ncol = Plantspecies)/Plantspecies ##scaled by number of competitors within a guild
-  diag(Pmatrix)<-1 #intraspecific competion for plants
-  
-  out<-return(list(Amatrix=Amatrix,Pmatrix=Pmatrix))
-  
-}
-
-
 
 
 # function for sampling competitive coefficients from exponential distribution 
