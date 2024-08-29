@@ -5,7 +5,7 @@ For Journal: PLOS Biology
 
 The codes and scripts are prepared by Gaurav Baruah.
 
-## We attach one example hystereis simulation of a plant-pollinator network (other than what is shown in the main-text) and one collapsed network revival (other than what is shown in main manuscript).  See below in section R scripts  
+We also attach one example hysteresis simulation of a plant-pollinator network (other than what is shown in the main-text) and one collapsed network revival (other than what is shown in main text).  See below in the section R scripts  
 
 #### Simulated R Data and Empirical data from web-of-life database and Kaiser-Bunbury et al 2017 paper: 
 1. The folder `datasets_1` contains incidence data for the plant-pollinator networks used in the manuscript.
