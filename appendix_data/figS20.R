@@ -16,10 +16,9 @@ library(network)
 library(sna)
 theme_set(theme_classic()) 
 
-
-load("S_targeted_degree_data.RData")
+load("S_targeted_random_data.RData")
 ############################## NETWORK NO 1  nad perturbation regime of random ####################################
-web1<- fact %>% filter(web == "datasets_1/M_PL_060_11.csv",individual.variation=="high",perturbation == "degree")
+web1<- fact %>% filter(web == "datasets_1/M_PL_060_11.csv",individual.variation=="high",perturbation == "random")
 
 
 g<-adj.mat( "datasets_1/M_PL_060_11.csv") #network web names
@@ -61,7 +60,7 @@ hvar_richness_w1_random<-ggplot(temp , aes(x=x,y=y,z=round(Richness,3)))+
   geom_raster(aes(fill=Richness),show.legend =TRUE)+ 
   scale_fill_gradient(limits=range(temp$Richness), high = 'yellow', low = 'red')+
   xlab(expression( paste(gamma[0],",", "Mutualism strength")))+ylab("Forcing strength") + 
-  ggtitle("Degree perturbation")+
+  ggtitle("Random perturbation")+
   theme_cowplot()+
   xlim(c(min(web1$Strength_mutualism),max(web1$Strength_mutualism)))+ 
   ylim(c(min(web1$forcing_strength),max(web1$forcing_strength)))
@@ -70,7 +69,7 @@ hvar_richness_w1_random
 
 
 ########################### WITH low trait variation ######################################
-web2<- fact %>% filter(web == "datasets_1/M_PL_060_11.csv",individual.variation=="low", perturbation == "degree")
+web2<- fact %>% filter(web == "datasets_1/M_PL_060_11.csv",individual.variation=="low", perturbation == "random")
 
 temp2<-with(web2,interp(web2$Strength_mutualism,web2$forcing_strength,
                         web2$recovery_richness,xo=seq(min(web2$Strength_mutualism),max(web2$Strength_mutualism),length=9), 
@@ -83,7 +82,7 @@ lvar_richness_w1_random<-ggplot(temp2 , aes(x=x,y=y,z=round(Richness,3)))+
   geom_raster(aes(fill=Richness),show.legend =TRUE)+ 
   scale_fill_gradient(limits=range(temp2$Richness), high = 'yellow', low = 'red')+
   xlab(expression( paste(gamma[0],",", "Mutualism strength")))+ylab("Forcing strength") + 
-  ggtitle("Degree perturbation")+
+  ggtitle("Random perturbation")+
   theme_cowplot()+
   xlim(c(min(web2$Strength_mutualism),max(web2$Strength_mutualism)))+ 
   ylim(c(min(web2$forcing_strength),max(web2$forcing_strength)))
@@ -96,7 +95,7 @@ lvar_richness_w1_random
 #################################################################
 ############################ 2nd network ########################
 
-web2<- fact %>% filter(web == "datasets_1/M_PL_003.csv",individual.variation=="high", perturbation == "degree" )
+web2<- fact %>% filter(web == "datasets_1/M_PL_003.csv",individual.variation=="high", perturbation == "random" )
 
 g<-adj.mat( "datasets_1/M_PL_003.csv") #network web names
 Aspecies<- dim(g)[2] # no of animal species
@@ -136,7 +135,7 @@ hvar_richness_w2_random<-ggplot(temp3 , aes(x=x,y=y,z=round(Richness,3)))+
   geom_raster(aes(fill=Richness),show.legend =TRUE)+ 
   scale_fill_gradient(limits=range(temp3$Richness), high = 'yellow', low = 'red')+
   xlab(expression( paste(gamma[0],",", "Mutualism strength")))+ylab("Forcing strength") + 
-  ggtitle("Degree perturbation")+
+  ggtitle("Random perturbation")+
   theme_cowplot()+
   xlim(c(min(web2$Strength_mutualism),max(web2$Strength_mutualism)))+ ylim(c(min(web2$forcing_strength),max(web2$forcing_strength)))
 #scale_x_continuous(expand=c(0,0)) +scale_y_continuous(expand=c(0,0))
@@ -145,7 +144,7 @@ hvar_richness_w2_random
 
 
 
-web3<- fact %>% filter(web == "datasets_1/M_PL_003.csv",individual.variation=="low", perturbation == "degree" )
+web3<- fact %>% filter(web == "datasets_1/M_PL_003.csv",individual.variation=="low", perturbation == "random" )
 
 
 temp4<-with(web3,interp(web3$Strength_mutualism,web3$forcing_strength,
@@ -159,7 +158,7 @@ lvar_richness_w3_random<-ggplot(temp4 , aes(x=x,y=y,z=round(Richness,3)))+
   geom_raster(aes(fill=Richness),show.legend =TRUE)+ 
   scale_fill_gradient(limits=range(temp4$Richness), high = 'yellow', low = 'red')+
   xlab(expression( paste(gamma[0],",", "Mutualism strength")))+ylab("Forcing strength") + 
-  ggtitle("Degree perturbation")+
+  ggtitle("Random perturbation")+
   theme_cowplot()+
   xlim(c(min(web3$Strength_mutualism),max(web3$Strength_mutualism)))+ ylim(c(min(web3$forcing_strength),max(web3$forcing_strength)))
 #scale_x_continuous(expand=c(0,0)) +scale_y_continuous(expand=c(0,0))
@@ -282,16 +281,4 @@ ggpubr::ggarrange(net_1, hvar_richness_w1_random,
 
 dev.off()
 
-pdf(file = "s_targeted_degree_example_low_var.pdf",   # The directory you want to save the file in
-    width = 7, # The width of the plot in inches
-    height = 10) # The height of the plot in inches
 
-ggpubr::ggarrange(net_1, lvar_richness_w1_random,
-                  net_1, lvar_richness_w5_targeted,
-                  net_2, lvar_richness_w3_random,
-                  net_2,lvar_richness_w6_targeted,
-                  
-                  labels = c("A","B","C","D","E","F","G","H"),
-                  nrow=4,ncol=2)
-
-dev.off()
