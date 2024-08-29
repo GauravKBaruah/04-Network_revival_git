@@ -32,7 +32,7 @@ fact<- expand.grid(`Strength_mutualism`=1.15,
 
 
 g<-adj.mat(myfiles[which(myfiles == fact$web[1])]) #network web names
-# g<-g[-1,-1] 
+
 
 
 Aspecies<- dim(g)[2] # no of animal species
@@ -46,12 +46,11 @@ for(j in 1:Aspecies){
   degree.animals[j]<-sum(g[,j]) # degree of animals
 }
 
-##control loop for selecting whether variation is high or low
 sig <-runif((Aspecies+Plantspecies),0.005,0.005)
 h2 <- runif((Aspecies+Plantspecies),0,0)
 
 
-## vector of species trait standard deviations
+
 N <- runif( (Aspecies+Plantspecies) , 0,0.001) #mimicking a system with low population density near the collapse state
 nainit<-N[1:Aspecies]
 npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
@@ -154,7 +153,7 @@ sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax
 ##########high variation forcing- no evolutiona ###############
 
 
-sig <-runif((Aspecies+Plantspecies),0.02,0.02)
+sig <-runif((Aspecies+Plantspecies),0.02,0.02)  #trait variatoin
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
@@ -208,7 +207,7 @@ solhvar<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, t
 ##########high variation forcing- yes evolution ###############
 
 
-sig <-runif((Aspecies+Plantspecies),0.02,0.02)
+sig <-runif((Aspecies+Plantspecies),0.02,0.02)  #trait variatoin
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
@@ -264,7 +263,7 @@ solhvarevo<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0
 ########## evolution + low variation ########
 
 
-sig <-runif((Aspecies+Plantspecies),0.005,0.005)
+sig <-runif((Aspecies+Plantspecies),0.005,0.005)   #trait variatoin low
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
@@ -395,19 +394,17 @@ for(j in 1:Aspecies){
   degree.animals[j]<-sum(g[,j]) # degree of animals
 }
 
-##control loop for selecting whether variation is high or low
 sig <-runif((Aspecies+Plantspecies),0.005,0.005)
 h2 <- runif((Aspecies+Plantspecies),0,0)
 
-
-## vector of species trait standard deviations
 N <- runif( (Aspecies+Plantspecies) , 0,0.001) #mimicking a system with low population density near the collapse state
 nainit<-N[1:Aspecies]
 npinit<-N[(Aspecies+1): (Aspecies+Plantspecies)]
 
+ma<-(outt %>% filter(webname == fact$web[1]))$m
 
-mainit<- runif(Aspecies,-0.25,0.25)
-mpinit<-runif(Plantspecies, -0.25,-0.25)
+mainit<-ma[1:Aspecies]
+mpinit<-ma[(Aspecies+1): (Aspecies+Plantspecies)]
 index_maxdegree_animal<-which(degree.animals == max(degree.animals))
 index_maxdegree_plants<-which(degree.plants == max(degree.plants))
 
@@ -503,7 +500,7 @@ sol1<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, tmax
 ##########high variation forcing- no evolutiona ###############
 
 
-sig <-runif((Aspecies+Plantspecies),0.02,0.02)
+sig <-runif((Aspecies+Plantspecies),0.02,0.02)  #trait variatoin
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
@@ -557,7 +554,7 @@ solhvar<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0, t
 ##########high variation forcing- yes evolution ###############
 
 
-sig <-runif((Aspecies+Plantspecies),0.02,0.02)
+sig <-runif((Aspecies+Plantspecies),0.02,0.02)    #trait variatoin
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
@@ -613,7 +610,7 @@ solhvarevo<-ode(func=eqs_perturbation, y=ic_f, parms=params_forcing, times=seq(0
 ########## evolution + low variation ########
 
 
-sig <-runif((Aspecies+Plantspecies),0.005,0.005)
+sig <-runif((Aspecies+Plantspecies),0.005,0.005)   #trait variatoin low
 params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                        Pmatrix=Pmatrix,w=gamma,
                        ic=ic_f,
