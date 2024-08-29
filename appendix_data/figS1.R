@@ -14,11 +14,9 @@ library(sna)
 library(nlme)
 library(lmerTest)
 library(ggplot2)
-library(ggnet)
-library(gganimate)
-library(gifski)
+
 #\############################################# proportion exhibited hysteresis : supplementary figure
-load("FigS1.RData")
+load("fig_S1.RData")
 
 # reading all the datasets
 # calculating nestedness and connectance
