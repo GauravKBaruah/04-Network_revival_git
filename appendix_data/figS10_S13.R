@@ -1,6 +1,4 @@
-
-library(foreach)
-library(doMC)
+rm(list=ls())
 library(statmod)
 library(sna)
 library(bipartite)
@@ -22,31 +20,6 @@ newfiles<-myfiles[1:154]
 
 load("figs10.RData")
 
-webnames<- unique(webdat_2$web.name)
-
-for(r in 1:nrow(webdat_2)){
-  
-  g<-adj.mat(newfiles[which(newfiles == as.character(webdat_2$web.name[r]))])
-  w_nestedness<-networklevel(g,c("weighted nestedness"))
-  w_nodf<-networklevel(g,c("weighted NODF"))
-  betn_temp<-betweenness(g)
-  normalised_betweeness<-(betn_temp - min(betn_temp))/(max(betn_temp)- min(betn_temp))
-  
-  webdat_2$modularity[r] <- NOS(web=g)$mod
-  webdat_2$median_centrality[r] <- median(normalised_betweeness,na.rm=T)
-  webdat_2$sd_centrality[r] <- sd(normalised_betweeness,na.rm=T)
-  webdat_2$weighted_nestedness[r] <- w_nestedness
-  webdat_2$weighted_NODF[r] <-w_nodf
-  
-  spdat_3$modularity[r] <- NOS(web=g)$mod
-  spdat_3$median_centrality[r] <-median(normalised_betweeness,na.rm=T)
-  spdat_3$sd_centrality[r] <- sd(normalised_betweeness,na.rm=T)
-  spdat_3$weighted_nestedness[r] <- w_nestedness
-  spdat_3$weighted_NODF[r] <- w_nodf
-  print(r)
-}
-
-#save(webdat_2,file = "figs10.RData")
 ##################### Supplementary analysis- of modularity, centrality, and weighted nestedness ##########
 webdat_2$modularity_group<- cut(webdat_2$modularity,
                                 breaks = c(0.48, 0.5, 0.6, 0.7, 0.8, 0.9), 
