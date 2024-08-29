@@ -1,7 +1,87 @@
-#code for Ecology Letters paper: 
-#" The impact of individual variation on abrupt collapses in mutualistic networks" 2021. Gaurav Baruah
-#email: gbaruahecoevo@gmail.com
+
 require(statmod)
+
+#function to calculate indirect based on the derivation in the S1 text section 4
+indirect_effects<-function(parameters){
+  
+  
+  #adjacency matrix A
+  A_matrix<- rbind( cbind(parameters$comp_matrixP, as.matrix(parameters$g )), 
+                    cbind(as.matrix(t(parameters$g) ), parameters$comp_matrixA  ))
+  A_matrix[which(A_matrix<1)]<-0
+  #identity matrix
+  Identity_matrix<- diag((parameters$A+parameters$P))
+  
+  
+  ## Gamma - matrix
+  sa<-parameters$s[1:parameters$A]
+  sp<-parameters$s[(parameters$A+1): (parameters$A+parameters$P)]
+  gamma<-matrix(0,nrow=parameters$P,ncol=parameters$A)
+  mua<-parameters$trait_vals[1:parameters$A]
+  mup<-parameters$trait_vals[(parameters$A+1): (parameters$A+parameters$P)]
+  for(i in 1:parameters$P){
+    for(j in 1:parameters$A){
+  
+        gamma[i,j] <- parameters$mut_strength*parameters$g[i,j]*parameters$w/(sqrt(2*sa[j] + 2*sp[i] + parameters$w^2))*
+          exp(-(mua[j]-mup[i])^2/(2*sa[j] + 2*sp[i] + parameters$w^2))
+  }
+  }
+  
+  
+   Gamma_matrix<- rbind(cbind(-parameters$comp_matrixP, gamma), 
+         cbind(t(gamma),-parameters$comp_matrixA  ))
+
+   
+  T_matrix<- Identity_matrix - Gamma_matrix
+  T_matrix <- solve(T_matrix) #net interactions
+
+  D<- -1*diag(parameters$P+parameters$A)
+  net_matrix<-(T_matrix%*%solve(D))
+  num_matrix<-matrix(0,nrow = (parameters$P+parameters$A),(parameters$P+parameters$A))
+ # for(i in 1:(parameters$P+parameters$A)){
+  #  for(j in 1:(parameters$P+parameters$A)){
+    
+   ##     num_matrix[i,j] <- (1-A_matrix[i,j])*net_matrix[i,j]
+     # }
+      
+      
+    
+  #}
+    #indirect_matrix_2<-T_matrix%*%Gamma_matrix^2
+  
+    #proportion_net_indirect_effects<-sum(indirect_matrix_2)/sum(T_matrix)
+    #mean_net_indirect_effects<-mean(colSums(indirect_matrix_2/(sum(T_matrix))))
+  net_indirect_effects<- net_matrix - (Identity_matrix+Gamma_matrix)
+  
+  spectral_radius <- max(Re(eigen(Gamma_matrix,only.values = T)$values))
+  mean_indirect_effects<- mean(colSums(net_indirect_effects))
+  sum_indirect_effects<-sum(net_indirect_effects)
+
+  indirect_effects_order3<-sum(Gamma_matrix^3)
+  indirect_effects_order4<-sum(Gamma_matrix^4)
+  indirect_effects_order5<-sum(Gamma_matrix^5)
+  
+  mean_indirect_effects3<-mean(colSums(Gamma_matrix^3))
+  mean_indirect_effects4<-mean(colSums(Gamma_matrix^4))
+  mean_indirect_effects5<-mean(colSums(Gamma_matrix^5))
+  
+  
+   return(list(mean_indirect_effects=mean_indirect_effects,
+               sum_indirect_effects=sum_indirect_effects,
+               spectral_radius=spectral_radius,
+               indirect_effects_order3=indirect_effects_order3,
+               indirect_effects_order4=indirect_effects_order4,
+               indirect_effects_order5=indirect_effects_order5,
+               mean_indirect_effects3=mean_indirect_effects3,
+               mean_indirect_effects4=mean_indirect_effects4,
+               mean_indirect_effects5=mean_indirect_effects5))
+}
+
+
+
+
+
+
 
 cutoff <- function(x) ifelse(x<1, (1*(x>0))*(x*x*x*(10+x*(-15+6*x))), 1)
 
