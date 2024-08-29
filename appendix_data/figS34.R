@@ -1,7 +1,5 @@
 rm(list=ls())
 
-
-
 load("nestedness_matrices_net.RData")
 require(cowplot) ## for arranging plots in a grid
 library(dplyr)
