@@ -5,6 +5,8 @@ For Journal: PLOS Biology
 
 The codes and scripts are prepared by Gaurav Baruah.
 
+## We attach one example hystereis simulation of a plant-pollinator network (other than what is shown in the main-text) and one collapsed network revival (other than what is shown in main manuscript).  See below in section R scripts  
+
 #### Simulated R Data and Empirical data from web-of-life database and Kaiser-Bunbury et al 2017 paper: 
 1. The folder `datasets_1` contains incidence data for the plant-pollinator networks used in the manuscript.
 
@@ -25,3 +27,4 @@ kaiser-bunbury_et_al_2017.html) and was used to produce figure 1E-1F.
 6. `fig3b.R`  R script that does the eco-evolutionary simulation to reproduce second part of figure 3 (i.e., Figure 3 I-N)
 7. `fig4_5.R` R script to reproduce figure 4 and figure 5. 
 8. `example_hysteresis_simulation.R` is an additional R script that simulates the dynamics of another 44 species network that shows hysteresis for a range of average mutualistic strength based on parameters mentioned in main-text. This R script however does not re-produce any figures in the main-text.
+9. `example_full_revival_of_network.R` is an additional R script that simulates the collapse of a plant-pollinator network, and also revival with a certain forcing strength, for a duration, for a low avg. mutualistic strength. In this script, we simulate the dynamics of the network over a time period of $10^3$ time points for an average mutualistic strength  $\gamma_{0} =4$. Note that this  $\gamma_{0}$ value of 4 does not fall in the collapse regime. At the final time point, we take the final mean trait values of species for final simulations of network resurrection.
