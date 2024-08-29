@@ -80,7 +80,6 @@ fact<- expand.grid(`Strength_mutualism`=unique(webdat_2$mut_strength),
 
 
 new_ddf<-NULL
-load("Upper_bound_abundance_response_time.RData")
 for(r in 1:nrow(fact)){
   
   g<-adj.mat(myfiles[which(myfiles == fact$web[r])]) #network web names
@@ -159,7 +158,6 @@ for(r in 1:nrow(fact)){
   params_forcing <- list(time=tmax,matrix=g,sig=sig,Amatrix=Amatrix,
                          Pmatrix=Pmatrix,w=width,
                          ic=ic_f,
-                         dat=dat,
                          individual_variation=fact$individual.variation[r],
                          mut.strength=mut.strength,m=muinit,C=C,nestedness=nestedness,
                          web.name=web.name,h2=0.4, ba=ba,bp=bp,dganimals=dganimals,
