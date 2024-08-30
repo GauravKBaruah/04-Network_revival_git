@@ -1,5 +1,5 @@
-#code for Ecology Letters paper: 
-#" The impact of individual variation on abrupt collapses in mutualistic networks" 2021. Gaurav Baruah
+#Functions used in the paper " Reviving collapsed plant-polliantor networks from a single species" 2024. Gaurav Baruah & Meike Witmann. Some of these functions are borrowed from various open access codes and Rscripts
+#including Baruah 2022 Eco. Letts paper.
 #email: gbaruahecoevo@gmail.com
 require(statmod)
 
