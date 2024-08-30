@@ -1,6 +1,9 @@
 # Repository for the paper titled "Reviving collapsed plant-pollinator networks from a single species."
 Authors: Gaurav Baruah, Meike Wittmann
 For Journal: PLOS Biology
+
+[![DOI](https://zenodo.org/badge/698185778.svg)](https://zenodo.org/doi/10.5281/zenodo.13598905)
+
 ### This repository contains the following Rscripts, and data used for producing the figures in the main-text as well as the for the supplementary data (in folder appendix_data for reproducing the figures of the supplementary S1 text).
 
 The codes and scripts are prepared by Gaurav Baruah.
